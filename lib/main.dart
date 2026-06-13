@@ -90,9 +90,33 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _iniciarSesion() {
+    final String correo = _emailController.text.trim();
+    final String password = _passwordController.text.trim();
+
+    if (correo.isEmpty || password.isEmpty) {
+      showCupertinoDialog<void>(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text('Datos incompletos'),
+            content: const Text('Ingresa tu correo y contraseña.'),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Aceptar'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
     Navigator.pushReplacement(
       context,
-      CupertinoPageRoute<void>(builder: (context) => const MenuPage()),
+      CupertinoPageRoute<void>(
+        builder: (context) => MenuPage(correoUsuario: correo),
+      ),
     );
   }
 
@@ -153,7 +177,9 @@ class _LoginPageState extends State<LoginPage> {
 
 // 2. Menú
 class MenuPage extends StatelessWidget {
-  const MenuPage({super.key});
+  const MenuPage({super.key, required this.correoUsuario});
+
+  final String correoUsuario;
 
   void _abrirPagina(BuildContext context, Widget page) {
     Navigator.push(
@@ -212,7 +238,10 @@ class MenuPage extends StatelessWidget {
                   leading: const Icon(CupertinoIcons.person_circle, size: 32),
                   title: const Text('Perfil', style: TextStyle(fontSize: 21)),
                   trailing: const CupertinoListTileChevron(),
-                  onTap: () => _abrirPagina(context, const PerfilPage()),
+                  onTap: () => _abrirPagina(
+                    context,
+                    PerfilPage(correoUsuario: correoUsuario),
+                  ),
                 ),
                 CupertinoListTile(
                   padding: _listTilePadding,
@@ -416,7 +445,9 @@ class ListadoPersonasPage extends StatelessWidget {
 
 // 5. Perfil
 class PerfilPage extends StatelessWidget {
-  const PerfilPage({super.key});
+  const PerfilPage({super.key, required this.correoUsuario});
+
+  final String correoUsuario;
 
   @override
   Widget build(BuildContext context) {
@@ -435,54 +466,34 @@ class PerfilPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            const Center(
+            Center(
               child: Text(
-                'Diego Alexis Ccaihuari Tintaya',
+                correoUsuario,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Center(
-              child: Text(
-                'Estudiante Tecsup',
-                style: TextStyle(
-                  fontSize: 21,
-                  color: CupertinoColors.systemGrey,
-                ),
               ),
             ),
             const SizedBox(height: 34),
             CupertinoListSection.insetGrouped(
               backgroundColor: CupertinoColors.white,
               margin: EdgeInsets.zero,
-              children: const [
+              children: [
                 CupertinoListTile(
-                  padding: _listTilePadding,
-                  leadingSize: _listIconSize,
-                  leadingToTitle: 18,
-                  leading: Icon(CupertinoIcons.mail, size: 34),
-                  title: Text('Correo', style: TextStyle(fontSize: 21)),
-                  subtitle: Text(
-                    'diego@email.com',
-                    style: TextStyle(fontSize: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 18,
                   ),
-                ),
-                CupertinoListTile(
-                  padding: _listTilePadding,
                   leadingSize: _listIconSize,
                   leadingToTitle: 18,
-                  leading: Icon(CupertinoIcons.phone, size: 34),
-                  title: Text('Teléfono', style: TextStyle(fontSize: 21)),
-                  subtitle: Text('987654321', style: TextStyle(fontSize: 16)),
-                ),
-                CupertinoListTile(
-                  padding: _listTilePadding,
-                  leadingSize: _listIconSize,
-                  leadingToTitle: 18,
-                  leading: Icon(CupertinoIcons.location, size: 34),
-                  title: Text('Ubicación', style: TextStyle(fontSize: 21)),
-                  subtitle: Text('Lima, Perú', style: TextStyle(fontSize: 16)),
+                  leading: const Icon(CupertinoIcons.mail, size: 34),
+                  title: const Text(
+                    'Correo electrónico',
+                    style: TextStyle(fontSize: 21),
+                  ),
+                  subtitle: Text(
+                    correoUsuario,
+                    style: const TextStyle(fontSize: 17),
+                  ),
                 ),
               ],
             ),
